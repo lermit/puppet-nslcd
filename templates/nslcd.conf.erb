@@ -1,0 +1,45 @@
+# /etc/nslcd.conf
+# file managed by puppet
+
+# nslcd configuration file. See nslcd.conf(5)
+# for details.
+
+# The user and group nslcd should run as.
+uid <%= scope.lookupvar('nslcd::process_user') %>
+gid <%= scope.lookupvar('nslcd::process_user') %>
+
+# The location at which the LDAP server(s) should be reachable.
+uri <%= scope.lookupvar('nslcd::uri') %>
+
+# The search base that will be used for all queries.
+<% if scope.lookupvar('nslcd::base_dn') != "" -%>
+# base dc=example,dc=net
+<% else -%>
+base <%= scope.lookupvar('nslcd::base_dn') %>
+<% end -%>
+
+# The LDAP protocol version to use.
+ldap_version <%= scope.lookupvar('nslcd::ldap_version') %>
+
+# The DN to bind with for normal lookups.
+<% if scope.lookupvar('nslcd::bind_dn') == "" -%>
+#binddn cn=annonymous,dc=example,dc=net
+<% else -%>
+binddn <%= scope.lookupvar('nslcd::bind_dn') %>
+<% end -%>
+<% if scope.lookupvar('nslcd::bind_dn') == "" -%>
+#bindpw secret
+<% else -%>
+bindpw <%= scope.lookupvar('nslcd::bind_pw') %>
+<% end -%>
+
+# The DN used for password modifications by root.
+#rootpwmoddn cn=admin,dc=example,dc=com
+
+# SSL options
+#ssl off
+#tls_reqcert never
+
+# The search scope.
+#scope sub
+

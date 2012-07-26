@@ -52,7 +52,7 @@ class nslcd::params {
   }
 
   $config_file_mode = $::operatingsystem ? {
-    default => '0644',
+    default => '0600',
   }
 
   $config_file_owner = $::operatingsystem ? {

@@ -397,13 +397,6 @@ class nslcd (
 
   ### Service monitoring, if enabled ( monitor => true )
   if $nslcd::bool_monitor == true {
-    monitor::port { "nslcd_${nslcd::protocol}_${nslcd::port}":
-      protocol => $nslcd::protocol,
-      port     => $nslcd::port,
-      target   => $nslcd::monitor_target,
-      tool     => $nslcd::monitor_tool,
-      enable   => $nslcd::manage_monitor,
-    }
     monitor::process { 'nslcd_process':
       process  => $nslcd::process,
       service  => $nslcd::service,

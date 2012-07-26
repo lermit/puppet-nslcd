@@ -47,10 +47,6 @@ class nslcd::params {
     default => 'nslcd',
   }
 
-  $config_dir = $::operatingsystem ? {
-    default => '/etc/nslcd',
-  }
-
   $config_file = $::operatingsystem ? {
     default => '/etc/nslcd.conf',
   }
@@ -95,8 +91,6 @@ class nslcd::params {
   # General Settings
   $my_class = ''
   $source = ''
-  $source_dir = ''
-  $source_dir_purge = false
   $template = 'nslcd/nslcd.conf.erb'
   $options = ''
   $service_autorestart = true

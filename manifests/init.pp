@@ -18,18 +18,6 @@
 #   If defined, nslcd main config file will have the param: source => $source
 #   Can be defined also by the (top scope) variable $nslcd_source
 #
-# [*source_dir*]
-#   If defined, the whole nslcd configuration directory content is retrieved
-#   recursively from the specified source
-#   (source => $source_dir , recurse => true)
-#   Can be defined also by the (top scope) variable $nslcd_source_dir
-#
-# [*source_dir_purge*]
-#   If set to true (default false) the existing configuration directory is
-#   mirrored with the content retrieved from source_dir
-#   (source => $source_dir , recurse => true , purge => true)
-#   Can be defined also by the (top scope) variable $nslcd_source_dir_purge
-#
 # [*template*]
 #   Sets the path to the template to use as content for main configuration file
 #   If defined, nslcd main config file has: content => content("$template")
@@ -150,9 +138,6 @@
 # [*process_user*]
 #   The name of the user nslcd runs with. Used by puppi and monitor.
 #
-# [*config_dir*]
-#   Main configuration directory. Used by puppi
-#
 # [*config_file*]
 #   Main configuration file path
 #
@@ -207,8 +192,6 @@
 class nslcd (
   $my_class            = params_lookup( 'my_class' ),
   $source              = params_lookup( 'source' ),
-  $source_dir          = params_lookup( 'source_dir' ),
-  $source_dir_purge    = params_lookup( 'source_dir_purge' ),
   $template            = params_lookup( 'template' ),
   $service_autorestart = params_lookup( 'service_autorestart' , 'global' ),
   $options             = params_lookup( 'options' ),
@@ -233,7 +216,6 @@ class nslcd (
   $process             = params_lookup( 'process' ),
   $process_args        = params_lookup( 'process_args' ),
   $process_user        = params_lookup( 'process_user' ),
-  $config_dir          = params_lookup( 'config_dir' ),
   $config_file         = params_lookup( 'config_file' ),
   $config_file_mode    = params_lookup( 'config_file_mode' ),
   $config_file_owner   = params_lookup( 'config_file_owner' ),
@@ -252,7 +234,6 @@ class nslcd (
   $bind_pw             = params_lookup( 'bind_pw' )
   ) inherits nslcd::params {
 
-  $bool_source_dir_purge=any2bool($source_dir_purge)
   $bool_service_autorestart=any2bool($service_autorestart)
   $bool_absent=any2bool($absent)
   $bool_disable=any2bool($disable)
@@ -361,22 +342,6 @@ class nslcd (
     replace => $nslcd::manage_file_replace,
     audit   => $nslcd::manage_audit,
   }
-
-  # The whole nslcd configuration directory can be recursively overriden
-  if $nslcd::source_dir {
-    file { 'nslcd.dir':
-      ensure  => directory,
-      path    => $nslcd::config_dir,
-      require => Package['nslcd'],
-      notify  => $nslcd::manage_service_autorestart,
-      source  => $nslcd::source_dir,
-      recurse => true,
-      purge   => $nslcd::source_dir_purge,
-      replace => $nslcd::manage_file_replace,
-      audit   => $nslcd::manage_audit,
-    }
-  }
-
 
   ### Include custom class if $my_class is set
   if $nslcd::my_class {

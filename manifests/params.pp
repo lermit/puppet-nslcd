@@ -24,7 +24,7 @@ class nslcd::params {
   ### Application related parameters
 
   $package = $::operatingsystem ? {
-    default => 'nslcd',
+    default => 'libnss-ldapd',
   }
 
   $service = $::operatingsystem ? {

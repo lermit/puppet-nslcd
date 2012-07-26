@@ -81,27 +81,6 @@
 #   Can be defined also by the (top scope) variables $nslcd_puppi_helper
 #   and $puppi_helper
 #
-# [*firewall*]
-#   Set to 'true' to enable firewalling of the services provided by the module
-#   Can be defined also by the (top scope) variables $nslcd_firewall
-#   and $firewall
-#
-# [*firewall_tool*]
-#   Define which firewall tool(s) (ad defined in Example42 firewall module)
-#   you want to use to open firewall for nslcd port(s)
-#   Can be defined also by the (top scope) variables $nslcd_firewall_tool
-#   and $firewall_tool
-#
-# [*firewall_src*]
-#   Define which source ip/net allow for firewalling nslcd. Default: 0.0.0.0/0
-#   Can be defined also by the (top scope) variables $nslcd_firewall_src
-#   and $firewall_src
-#
-# [*firewall_dst*]
-#   Define which destination ip to use for firewalling. Default: $ipaddress
-#   Can be defined also by the (top scope) variables $nslcd_firewall_dst
-#   and $firewall_dst
-#
 # [*debug*]
 #   Set to 'true' to enable modules debugging
 #   Can be defined also by the (top scope) variables $nslcd_debug and $debug
@@ -165,18 +144,6 @@
 # [*log_file*]
 #   Log file(s). Used by puppi
 #
-# [*port*]
-#   The listening port, if any, of the service.
-#   This is used by monitor, firewall and puppi (optional) components
-#   Note: This doesn't necessarily affect the service configuration file
-#   Can be defined also by the (top scope) variable $nslcd_port
-#
-# [*protocol*]
-#   The protocol used by the the service.
-#   This is used by monitor, firewall and puppi (optional) components
-#   Can be defined also by the (top scope) variable $nslcd_protocol
-#
-#
 # == Examples
 #
 # You can use this class in 2 ways:
@@ -204,10 +171,6 @@ class nslcd (
   $monitor_target      = params_lookup( 'monitor_target' , 'global' ),
   $puppi               = params_lookup( 'puppi' , 'global' ),
   $puppi_helper        = params_lookup( 'puppi_helper' , 'global' ),
-  $firewall            = params_lookup( 'firewall' , 'global' ),
-  $firewall_tool       = params_lookup( 'firewall_tool' , 'global' ),
-  $firewall_src        = params_lookup( 'firewall_src' , 'global' ),
-  $firewall_dst        = params_lookup( 'firewall_dst' , 'global' ),
   $debug               = params_lookup( 'debug' , 'global' ),
   $audit_only          = params_lookup( 'audit_only' , 'global' ),
   $package             = params_lookup( 'package' ),
@@ -225,8 +188,6 @@ class nslcd (
   $data_dir            = params_lookup( 'data_dir' ),
   $log_dir             = params_lookup( 'log_dir' ),
   $log_file            = params_lookup( 'log_file' ),
-  $port                = params_lookup( 'port' ),
-  $protocol            = params_lookup( 'protocol' ),
   $uri                 = params_lookup( 'uri' ),
   $base_dn             = params_lookup( 'base_dn' ),
   $ldap_version        = params_lookup( 'ldap_version' ),
@@ -240,7 +201,6 @@ class nslcd (
   $bool_disableboot=any2bool($disableboot)
   $bool_monitor=any2bool($monitor)
   $bool_puppi=any2bool($puppi)
-  $bool_firewall=any2bool($firewall)
   $bool_debug=any2bool($debug)
   $bool_audit_only=any2bool($audit_only)
 
@@ -285,13 +245,6 @@ class nslcd (
     $manage_monitor = false
   } else {
     $manage_monitor = true
-  }
-
-  if $nslcd::bool_absent == true
-  or $nslcd::bool_disable == true {
-    $manage_firewall = false
-  } else {
-    $manage_firewall = true
   }
 
   $manage_audit = $nslcd::bool_audit_only ? {
@@ -372,22 +325,6 @@ class nslcd (
       enable   => $nslcd::manage_monitor,
     }
   }
-
-
-  ### Firewall management, if enabled ( firewall => true )
-  if $nslcd::bool_firewall == true {
-    firewall { "nslcd_${nslcd::protocol}_${nslcd::port}":
-      source      => $nslcd::firewall_src,
-      destination => $nslcd::firewall_dst,
-      protocol    => $nslcd::protocol,
-      port        => $nslcd::port,
-      action      => 'allow',
-      direction   => 'input',
-      tool        => $nslcd::firewall_tool,
-      enable      => $nslcd::manage_firewall,
-    }
-  }
-
 
   ### Debugging, if enabled ( debug => true )
   if $nslcd::bool_debug == true {
